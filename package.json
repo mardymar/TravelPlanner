@@ -32,6 +32,7 @@
     "jquery": "^3.1.1",
     "mongoose": "^4.8.6",
     "nodemon": "^1.11.0",
+    "qpx-express": "^16.1.12",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-shallow-render": "^1.0.1",
@@ -47,7 +48,6 @@
     "chai": "^4.1.1",
     "jest": "^20.0.4",
     "mocha": "^3.5.0",
-    "qpx-express": "^16.1.12",
     "react-addons-test-utils": "^15.6.0"
   },
   "babel": {
