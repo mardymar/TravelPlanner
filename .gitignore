@@ -1,7 +1,6 @@
 
 bundle.js
 node_modules/
-config.js
 
 # Logs
 logs
