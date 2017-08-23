@@ -46,14 +46,14 @@ var saveToDatabase = function(data,callback) {
              console.log('error saving to the db ', err);
              callback(err, null);
            } else {
-             console.log('successfully saved a new record to the db ')
+             console.log('successfully saved a new record to the db ');
              callback(null, result);
            }
          })
       }
     }
   })
-}
+};
 
 var deleteFromDatabase = function(id, callback){
   Item.remove({_id: id}, function(err){
@@ -77,5 +77,5 @@ var selectAll = function(callback) {
 };
 
 module.exports.selectAll = selectAll;
-module.exports.saveToDatabase =saveToDatabase;
-module.exports.deleteFromDatabase =deleteFromDatabase;
+module.exports.saveToDatabase = saveToDatabase;
+module.exports.deleteFromDatabase = deleteFromDatabase;

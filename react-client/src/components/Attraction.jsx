@@ -15,8 +15,6 @@ function Attraction ({attrItems, handleAttrItemState}) {
       <h3 className = 'glyphicon glyphicon-camera'></h3>
     )
   }
-
-
 }
 
 export default Attraction;
