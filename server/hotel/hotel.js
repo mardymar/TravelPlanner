@@ -55,6 +55,6 @@ var hotel = function (info, callback){
   .catch(e => {
     console.log(e);
   });
-}
+};
 
 module.exports.hotel = hotel;

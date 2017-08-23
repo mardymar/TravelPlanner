@@ -1,7 +1,7 @@
 import React from 'react';
 import FoodItem from './FoodItem.jsx';
 
-const FoodList = ({foodlist,handleFoodItemState}) => {
+const FoodList = ({foodlist, handleFoodItemState}) => {
 
   if (foodlist.length > 0) {
     return (

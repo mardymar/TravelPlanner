@@ -15,13 +15,58 @@ body {
  background-size: cover;
 }
 
+#fixed-div {
+  position: fixed;
+  top: 2em;
+  right: 4em;
+}
+
+.food-address {
+  font-size: .8em;
+}
+
+.hotel-address {
+  font-size: .8em;
+}
+
+.hotel-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow:ellipsis;
+}
+
+.weather-icon {
+  margin-top: 7em;
+}
+
 .search-wrapper {
   background: rgba(45, 45, 45, .2);
-  padding: 1em 1em 0em 1em;
+  padding: 1em 1em 1em 1em;
+  border-radius: 25px;
   text-align: center;
   margin: 0 auto;
   position: relative;
-  width:80%;
+}
+
+.budgetbar-wrapper {
+  background: rgba(45, 45, 45, .2);
+  border-radius: 25px;
+  padding: 1em 1em 1em 1em;
+  text-align: center;
+  margin: 0 auto;
+  margin-bottom: 25px;
+  position: relative;
+  float: top;
+}
+
+.budgetfloat-wrapper {
+  background: rgba(96, 245, 118, .4);
+  border-radius: 100px;
+  padding: 1em 1em 1em 1em;
+  text-align: center;
+  position: relative;
+  float: top;
+  z-index: 999;
 }
 
 .input-text {

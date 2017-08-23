@@ -9,6 +9,8 @@ import Attraction from './components/Attraction.jsx';
 import FoodList from './components/FoodList.jsx';
 import Weather from './components/Weather.jsx';
 import SavedTrips from './components/savedTrips.jsx';
+import BudgetBar from './components/BudgetBar.jsx';
+import BudgetFloat from './components/BudgetFloat.jsx';
 const FlightAPI = require('qpx-express');
 
 
@@ -21,10 +23,14 @@ class App extends React.Component {
       departureDate: '',
       arrivalDate: '',
       returnDate: '',
-      addresses:[
+      addresses: [
         {category: 'hotel', name: 'London Hilton on Park Lane', address: '22 Park Ln, Mayfair, London W1K 1BE, UK'},
         {category: 'restaurant', name: 'Dinner by Heston Blumenthal', address: '66 Knightsbridge, London SW1X 7LA, UK'},
-        {category: 'restaurant', name: 'Nobu London', address: 'Metropolitan by COMO, 19 Old Park Ln, Mayfair, London W1K 1LB, UK'}
+        {
+          category: 'restaurant',
+          name: 'Nobu London',
+          address: 'Metropolitan by COMO, 19 Old Park Ln, Mayfair, London W1K 1LB, UK'
+        }
       ],
       flights: [],
       savedChoices: [{
@@ -39,15 +45,20 @@ class App extends React.Component {
       attrItems: [],
       hotels: [],
       foodList: [],
-      weather:[],
-      weatherIcon: ''
-    }
+      weather: [],
+      weatherIcon: '',
+      budget: ''
+    };
+
+
+
     this.onSearch = this.onSearch.bind(this);
     this.responseToSaveAddress = this.responseToSaveAddress.bind(this);
     this.requestWeather = this.requestWeather.bind(this);
     this.removeSingleDatabaseRecord = this.removeSingleDatabaseRecord.bind(this);
     this.saveToDatabase = this.saveToDatabase.bind(this);
     this.retrieveFromDatabase = this.retrieveFromDatabase.bind(this);
+    this.changeBudget = this.changeBudget.bind(this);
   }
 
   componentDidMount() {
@@ -55,14 +66,15 @@ class App extends React.Component {
   }
 
   hotelsSearch() {
-     $.ajax({
+    $.ajax({
       url: '/hotels',
       method: 'GET',
       data: {city: this.state.arrivalLocation},
       success: (res) => {
-        const parsedHotel = JSON.parse( res );
+        const parsedHotel = JSON.parse(res);
+        parsedHotel.sort((a, b) => b.rating - a.rating);
         const addHotelAddress = this.state.addresses
-        .concat( parsedHotel.map( this.responseToSaveAddress( 'hotel' ) ) );
+          .concat(parsedHotel.map(this.responseToSaveAddress('hotel')));
 
         this.setState({
           hotels: parsedHotel,
@@ -72,12 +84,10 @@ class App extends React.Component {
       error: (err) => {
         console.log('error !')
       }
-     })
+    })
   }
 
-  handleHotelClick(hotel, event){
-    console.log(hotel.url);
-
+  handleHotelClick(hotel, event) {
     this.removeClass('hotelHighlight');
     if (this.state.selectedHotelId === hotel.id) {
       this.state.savedChoices[0].hotel = {};
@@ -93,8 +103,18 @@ class App extends React.Component {
         price: hotel.price,
         image_url: hotel.image_url
       };
-     this.state.savedChoices[0].hotel = saved;
+      this.state.savedChoices[0].hotel = saved;
     }
+  }
+
+  changeBudget(e) {
+    var str = e.target.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    var str = '$' + str;
+
+
+    this.setState({
+      budget: str
+    })
   }
 
   retrieveFlights(departureDate, returnDate, depLocation, arrLocation) {
@@ -103,13 +123,13 @@ class App extends React.Component {
 
     var body = {
       "request": {
-        "passengers": { "adultCount": 1 },
+        "passengers": {"adultCount": 1},
         "slice": [{
           "origin": depLocation,
           "destination": arrLocation,
           "date": departureDate,
           "maxStops": 0
-          },
+        },
           {
             "origin": arrLocation,
             "destination": depLocation,
@@ -121,7 +141,7 @@ class App extends React.Component {
       }
     };
     var context = this;
-    qpx.getInfo(body, function(error, data){
+    qpx.getInfo(body, function (error, data) {
       context.setState({
         flights: data.trips.tripOption
       })
@@ -141,35 +161,13 @@ class App extends React.Component {
       },
       method: "POST"
     })
-    .then((resp) => resp.json())
-    .then(function(data) {
-      if (data.airports[0].name.includes('All Airports')) {
-        codes.departLoc = data.airports[1].iata;
-      } else {
-        codes.departLoc = data.airports[0].iata;
-      }
-    })
-    .then(() => {
-      fetch(`https://www.air-port-codes.com/api/v1/multi?term=${arrivalLoc}`, {
-        headers: {
-          Accept: "application/json",
-          "APC-Auth": APCAuth,
-          "APC-Auth-Secret": APCSecret
-        },
-        method: "POST"
-      })
       .then((resp) => resp.json())
-      .then(function(data) {
+      .then(function (data) {
         if (data.airports[0].name.includes('All Airports')) {
-          codes.arrivalLoc = data.airports[1].iata;
+          codes.departLoc = data.airports[1].iata;
         } else {
-          codes.arrivalLoc = data.airports[0].iata;
+          codes.departLoc = data.airports[0].iata;
         }
-      })
-      .then((codes) => {
-        context.setState({
-          airportCodes: codes
-        })
       })
       .then(() => {
         fetch(`https://www.air-port-codes.com/api/v1/multi?term=${arrivalLoc}`, {
@@ -180,24 +178,46 @@ class App extends React.Component {
           },
           method: "POST"
         })
-        .then((resp) => resp.json())
-        .then(function(data) {
-          if (data.airports[0].name.includes('All Airports')) {
-            codes.arrivalLoc = data.airports[1].iata;
-          } else {
-            codes.arrivalLoc = data.airports[0].iata;
-          }
-        })
-        .then((codes) => {
-          context.setState({
-            airportCodes: codes
-          });
-        })
-        .then(() => {
-          context.retrieveFlights(context.state.departureDate, context.state.returnDate, codes.departLoc, codes.arrivalLoc);
-        });
-      })
-    });
+          .then((resp) => resp.json())
+          .then(function (data) {
+            if (data.airports[0].name.includes('All Airports')) {
+              codes.arrivalLoc = data.airports[1].iata;
+            } else {
+              codes.arrivalLoc = data.airports[0].iata;
+            }
+          })
+          .then((codes) => {
+            context.setState({
+              airportCodes: codes
+            })
+          })
+          .then(() => {
+            fetch(`https://www.air-port-codes.com/api/v1/multi?term=${arrivalLoc}`, {
+              headers: {
+                Accept: "application/json",
+                "APC-Auth": APCAuth,
+                "APC-Auth-Secret": APCSecret
+              },
+              method: "POST"
+            })
+              .then((resp) => resp.json())
+              .then(function (data) {
+                if (data.airports[0].name.includes('All Airports')) {
+                  codes.arrivalLoc = data.airports[1].iata;
+                } else {
+                  codes.arrivalLoc = data.airports[0].iata;
+                }
+              })
+              .then((codes) => {
+                context.setState({
+                  airportCodes: codes
+                });
+              })
+              .then(() => {
+                context.retrieveFlights(context.state.departureDate, context.state.returnDate, codes.departLoc, codes.arrivalLoc);
+              });
+          })
+      });
   }
 
   removeClass(classname) {
@@ -236,7 +256,7 @@ class App extends React.Component {
     }
   }
 
-  onSearch (departureLocation, arrivalLocation, departureDate, returnDate) {
+  onSearch(departureLocation, arrivalLocation, departureDate, returnDate) {
     console.log('the departure location is: ', departureLocation);
     console.log('the arrival location is: ', arrivalLocation);
     console.log('the departure date is: ', departureDate);
@@ -258,7 +278,7 @@ class App extends React.Component {
         food: [],
         weather: {}
       }]
-    },function(){
+    }, function () {
       this.yelpAttrSearch();
       this.searchFood();
       this.getAirportCodes(departureLocation, arrivalLocation);
@@ -267,17 +287,17 @@ class App extends React.Component {
     });
   }
 
-   yelpAttrSearch(){
+  yelpAttrSearch() {
     $.ajax({
       url: '/attraction',
       type: 'POST',
-      data: { location: this.state.arrivalLocation },
+      data: {location: this.state.arrivalLocation},
       success: (res) => {
 
-        const parsedAttr = JSON.parse( res );
+        const parsedAttr = JSON.parse(res);
 
         const addAttrAddress = this.state.addresses
-        .concat( parsedAttr.map( this.responseToSaveAddress( 'attraction' ) ) );
+          .concat(parsedAttr.map(this.responseToSaveAddress('attraction')));
 
         this.setState({
           attrItems: parsedAttr,
@@ -285,27 +305,29 @@ class App extends React.Component {
 
         });
       },
-      error: function(data) {
+      error: function (data) {
       }
     })
   }
 
-  searchFood(){
+  searchFood() {
     $.ajax({
-      url:'/food',
-      data: { location: this.state.arrivalLocation },
+      url: '/food',
+      data: {location: this.state.arrivalLocation},
       type: 'POST',
-      success:(res) => {
+      success: (res) => {
 
-          const parsedFood = JSON.parse( res );
+        const parsedFood = JSON.parse(res);
 
-          const addFoodAddress = this.state.addresses
-          .concat( parsedFood.map( this.responseToSaveAddress( 'food' ) ) );
+        parsedFood.sort((a, b,) => b.rating - a.rating);
 
-          this.setState({
-            foodList: parsedFood,
-            addresses: addFoodAddress
-          });
+        const addFoodAddress = this.state.addresses
+          .concat(parsedFood.map(this.responseToSaveAddress('food')));
+
+        this.setState({
+          foodList: parsedFood,
+          addresses: addFoodAddress
+        });
       },
 
       error: (err) => {
@@ -314,13 +336,13 @@ class App extends React.Component {
     })
   }
 
-  saveToDatabase(){
+  saveToDatabase() {
     var app = this;
     $.ajax({
       url: '/save',
       method: 'post',
       data: {data: JSON.stringify(app.state.savedChoices[0])},
-      success: (data) =>{
+      success: (data) => {
         this.retrieveFromDatabase();
       },
       error: (err) => {
@@ -329,8 +351,8 @@ class App extends React.Component {
     })
   }
 
-  responseToSaveAddress( category ){
-    return function( {name, location, coordinates} ){
+  responseToSaveAddress(category) {
+    return function ({name, location, coordinates}) {
       const display_address = location.display_address;
 
       return {
@@ -342,59 +364,58 @@ class App extends React.Component {
     }
   }
 
-
   requestWeather(city, date) {
     var context = this;
     $.ajax({
       method: "POST",
       url: "/weather",
       data: {location: city, date: date},
-      success: function(data) {
+      success: function (data) {
         var parsedData = JSON.parse(data);
         context.setState({
           weather: [parsedData],
           weatherIcon: parsedData.icon
         })
       },
-      error: function(err) {
-          console.log('error in requesting data.')
+      error: function (err) {
+        console.log('error in requesting data.')
       }
     })
   }
 
-  handleAttrItemState(e){
-    this.updateSavedChoices( 'attractions', e.props.attrItemEntry, e.state.selected );
+  handleAttrItemState(e) {
+    this.updateSavedChoices('attractions', e.props.attrItemEntry, e.state.selected);
   }
 
-  handleFoodItemState(e){
-    this.updateSavedChoices( 'food', e.props.fooditem, e.state.selected );
+  handleFoodItemState(e) {
+    this.updateSavedChoices('food', e.props.fooditem, e.state.selected);
   }
 
-  updateSavedChoices( categoryName, itemData, selected ){
-    let list = this.state.savedChoices[0][ categoryName ];
-    if( list === undefined ){
+  updateSavedChoices(categoryName, itemData, selected) {
+    let list = this.state.savedChoices[0][categoryName];
+    if (list === undefined) {
       return;
     }
 
     var selectItem = {};
 
-    if( selected ){
+    if (selected) {
       selectItem.name = itemData.name;
       selectItem.address = itemData.location.display_address.join(', ');
       selectItem.price = itemData.price;
-      selectItem.image_url = itemData. image_url;
+      selectItem.image_url = itemData.image_url;
       selectItem.category = itemData.categories[0].title;
 
-      list.push( selectItem );
+      list.push(selectItem);
     }
-    else{
-      let index = list.indexOf( selectItem );
-      if( index >= 0 ){
-        list.splice( index, 1 );
+    else {
+      let index = list.indexOf(selectItem);
+      if (index >= 0) {
+        list.splice(index, 1);
       }
     }
 
-    this.state.savedChoices[0][ categoryName ] = list;
+    this.state.savedChoices[0][categoryName] = list;
   }
 
   retrieveFromDatabase() {
@@ -405,7 +426,7 @@ class App extends React.Component {
       success: (data) => {
         context.setState({
           savedTrips: data
-        }, function() {
+        }, function () {
         })
       },
       error: () => {
@@ -414,30 +435,40 @@ class App extends React.Component {
     })
   }
 
-  removeSingleDatabaseRecord (uniqueID) {
+  removeSingleDatabaseRecord(uniqueID) {
     var context = this;
-    $.ajax ({
+    $.ajax({
       method: "POST",
       url: "/removeRecord",
-      data:{uniqueID: uniqueID},
+      data: {uniqueID: uniqueID},
       success: () => {
         context.retrieveFromDatabase();
-      }, error: function() {
+      }, error: function () {
         console.log('client received an error when attempting to remove from db');
       }
     })
   }
 
-  render () {
+  render() {
     return (
       <div>
+        <BudgetFloat budget={this.state.budget}/>
+        <div className="container-fluid">
+          <h1 id='title'>Wanderly</h1>
+          <div className="row">
+            <div className="col-sm-2 weather-icon">
+              <Weather information={this.state.weather} icon={this.state.weatherIcon}/>
+            </div>
+            <div className="col-sm-8">
+              <SearchBar onSearch={this.onSearch}/>
+            </div>
+            <div className="col-sm-2">
+              <BudgetBar changeBudget={this.changeBudget}/>
+            </div>
+          </div>
 
-        <h1 id='title'>Wanderly</h1>
-          <span><SearchBar onSearch = {this.onSearch}/></span>
-          <Weather information = {this.state.weather} icon = {this.state.weatherIcon}/>
-
-        <table className='table'>
-          <thead>
+          <table className='table'>
+            <thead>
             <tr>
               <th>Flights</th>
               <th>Lodging</th>
@@ -445,27 +476,30 @@ class App extends React.Component {
               <th>Restaurants</th>
               <th>Saved</th>
             </tr>
-          </thead>
-          <tbody>
+            </thead>
+            <tbody>
             <tr>
               <td>
                 <Flights handleFlightClick={this.handleFlightClick.bind(this)} flights={this.state.flights}/>
               </td>
               <td>
-                <Hotels handleHotelClick={this.handleHotelClick.bind(this)} hotels = {this.state.hotels} />
+                <Hotels handleHotelClick={this.handleHotelClick.bind(this)} hotels={this.state.hotels}/>
               </td>
               <td>
-                <Attraction attrItems = {this.state.attrItems} handleAttrItemState = {this.handleAttrItemState.bind(this)} />
+                <Attraction attrItems={this.state.attrItems} handleAttrItemState={this.handleAttrItemState.bind(this)}/>
               </td>
               <td>
-                <FoodList foodlist = {this.state.foodList} handleFoodItemState = {this.handleFoodItemState.bind(this)} />
+                <FoodList foodlist={this.state.foodList} handleFoodItemState={this.handleFoodItemState.bind(this)}/>
               </td>
-              <td id = "savedTrips">
-                <SavedTrips trips={this.state.savedTrips} remove = {this.removeSingleDatabaseRecord} save = {this.saveToDatabase}/>
+              <td id="savedTrips">
+                <SavedTrips trips={this.state.savedTrips} remove={this.removeSingleDatabaseRecord}
+                            save={this.saveToDatabase}/>
               </td>
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+
+        </div>
       </div>
     )
   }
