@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const items = require('../database-mongo');
+const db = require('../database-mongo');
 const request = require('request');
 const app = express();
 const hotel = require('./hotel/hotel');
@@ -8,10 +8,28 @@ const yelpattr = require('./yelpattraction/yelpattraction');
 const yelpfood = require('./yelpfood/yelpfood');
 const weather = require('./weatherAPI/weather.js');
 const geolocation = require('./geolocationAPI/geolocation.js');
+const passport = require('passport');
+const session = require('express-session');
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+require('../config/passport')(passport);
 
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email' }));
+
+app.get('/auth/facebook/callback', passport.authenticate('facebook', {  
+  successRedirect: 'www.facebook.com',
+  failureRedirect: '/',
+}));
+
+app.get('/auth/twitter', passport.authenticate('twitter'));
+
+app.get('/auth/twitter/callback', passport.authenticate('twitter', {  
+  successRedirect: '/',
+  failureRedirect: '/',
+}));
 
 app.post('/attraction', function(req,res){
   const attrLocation = req.body.location;
@@ -47,7 +65,7 @@ app.post('/weather', function(req,res) {
 
 app.post('/save', (req, res) => {
   var data = JSON.parse(req.body.data);
-  items.saveToDatabase(data, function(err, result) {
+  db.saveToDatabase(data, function(err, result) {
     if(err) {
       console.log('server received database error when saving a record');
     } else {
@@ -58,12 +76,12 @@ app.post('/save', (req, res) => {
 
 app.post('/removeRecord', (req, res) => {
    var id = req.body.uniqueID;
-   items.deleteFromDatabase(id);
+   db.deleteFromDatabase(id);
    res.sendStatus(200);
 });
 
 app.get('/getAll', (req, res) => {
-  items.selectAll(function(err, result) {
+  db.selectAll(function(err, result) {
     if(err) {
       console.log('server received database error when retrieving records');
     } else {
@@ -74,7 +92,9 @@ app.get('/getAll', (req, res) => {
 });
 
 
-var port = process.env.PORT || 8080;
+
+var port = process.env.PORT || 3000;
+
 
 app.listen(port, function() {
   console.log(`listening on port ${port}`);

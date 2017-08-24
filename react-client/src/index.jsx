@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import Hotels from './components/hotels.jsx'
 import Flights from './components/Flights.jsx';
-import config from '../../config.js';
+import config from '../../config/auth.js';
 import SearchBar from './components/SearchBar.jsx';
 import Attraction from './components/Attraction.jsx';
 import FoodList from './components/FoodList.jsx';
@@ -571,11 +571,13 @@ class App extends React.Component {
     } );
   }
 
+
   sortFoodByRating() {
     this.setState( { foodRating: !this.state.foodRating }, () => {
       this.searchFood();
     } );
   }
+
 
   sortFoodByPrice( event ) {
     this.setState( { foodRating: false, foodPrice: event.target.textContent.length }, () => {
@@ -588,7 +590,9 @@ class App extends React.Component {
       <div>
         <BudgetFloat budget={this.state.budget}/>
         <div className="container-fluid">
+
           <h1 id='title'>Navigato</h1>
+          
           <div className="row">
             <div className="col-sm-2 weather-icon">
               <Weather information={this.state.weather} icon={this.state.weatherIcon}/>
