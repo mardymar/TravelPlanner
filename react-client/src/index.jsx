@@ -71,10 +71,6 @@ class App extends React.Component {
         exchange: res.quotes
       })
     });
-
-    $.get('/travelHotels', (res) => {
-      console.log(res);
-    })
   }
 
   hotelsSearch() {
@@ -361,33 +357,35 @@ class App extends React.Component {
   }
 
   searchFood() {
-    $.ajax({
-      url: '/food',
-      data: {
-        location: this.state.arrivalLocation,
-        rating: this.state.rating,
-        price: this.state.price
-      },
-      type: 'POST',
-      success: (res) => {
+    if ( this.state.arrivalLocation ) {
+      $.ajax({
+        url: '/food',
+        data: {
+          location: this.state.arrivalLocation,
+          rating: this.state.rating,
+          price: this.state.price
+        },
+        type: 'POST',
+        success: (res) => {
 
-        const parsedFood = JSON.parse(res);
+          const parsedFood = JSON.parse(res);
 
-        // parsedFood.sort((a, b,) => b.rating - a.rating);
+          // parsedFood.sort((a, b,) => b.rating - a.rating);
 
-        const addFoodAddress = this.state.addresses
-          .concat(parsedFood.map(this.responseToSaveAddress('food')));
+          const addFoodAddress = this.state.addresses
+            .concat(parsedFood.map(this.responseToSaveAddress('food')));
 
-        this.setState({
-          foodList: parsedFood,
-          addresses: addFoodAddress
-        });
-      },
+          this.setState({
+            foodList: parsedFood,
+            addresses: addFoodAddress
+          });
+        },
 
-      error: (err) => {
-        console.log('err', err);
-      }
-    })
+        error: (err) => {
+          console.log('err', err);
+        }
+      })
+    }
   }
 
   saveToDatabase() {
@@ -519,14 +517,16 @@ class App extends React.Component {
     } );
   }
 
-  sortFoodByPrice() {
-    if ( this.state.price === 4 ) {
+  sortFoodByPrice( event ) {
+    if ( this.state.rating ) {
+      var price = this.state.price;
+    } else if ( this.state.price === 4 ) {
       var price = 1;
     } else {
       var price = this.state.price + 1;
     }
 
-    this.setState( { rating: false, price: price }, () => {
+    this.setState( { rating: false, price: event.target.textContent.length }, () => {
       this.searchFood();
     } );
   }
@@ -557,7 +557,15 @@ class App extends React.Component {
               <th>Attractions</th>
               <th>Restaurants
                 <button onClick={ this.sortFoodByRating.bind( this ) } className='glyphicon glyphicon-star' style={ { float: 'right' } }></button>
-                <button onClick={ this.sortFoodByPrice.bind( this ) } className='glyphicon glyphicon-usd' style={ { float: 'right' } }></button>
+                <span className="dropdown">
+                  <button className='glyphicon glyphicon-usd dropdown-toggle' data-toggle="dropdown" style={ { float: 'right' } }></button>
+                  <ul className="dropdown-menu">
+                    <li><a onClick={ this.sortFoodByPrice.bind( this ) }>$</a></li>
+                    <li><a onClick={ this.sortFoodByPrice.bind( this ) }>$$</a></li>
+                    <li><a onClick={ this.sortFoodByPrice.bind( this ) }>$$$</a></li>
+                    <li><a onClick={ this.sortFoodByPrice.bind( this ) }>$$$$</a></li>
+                  </ul>
+                </span>
               </th>
               <th>Saved</th>
             </tr>
