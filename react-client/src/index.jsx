@@ -76,30 +76,31 @@ class App extends React.Component {
   }
 
   searchHotel() {
-    $.ajax({
-      url: '/hotels',
-      method: 'GET',
-      data: { 
-        location: this.state.arrivalLocation,
-        rating: this.state.hotelRating,
-        price: this.state.hotelPrice
-      },
-      success: (res) => {
-        const parsedHotel = JSON.parse(res);
-        console.log(parsedHotel);
-        parsedHotel.sort((a, b) => b.rating - a.rating);
-        const addHotelAddress = this.state.addresses
-          .concat(parsedHotel.map(this.responseToSaveAddress('hotel')));
+    if ( this.state.arrivalLocation ) {
+      $.ajax( {
+        method: 'GET',
+        url: '/hotels',
+        data: { 
+          location: this.state.arrivalLocation,
+          rating: this.state.hotelRating,
+          price: this.state.hotelPrice
+        },
+        success: ( res ) => {
+          console.log( 'SUCCESS: HOTELS' );
 
-        this.setState({
-          hotels: parsedHotel,
-          addresses: addHotelAddress
-        });
-      },
-      error: (err) => {
-        console.log('error !')
-      }
-    })
+          const parsedHotel = JSON.parse( res );
+          const addHotelAddress = this.state.addresses.concat( parsedHotel.map( this.responseToSaveAddress( 'hotel' ) ) );
+
+          this.setState( {
+            hotels: parsedHotel,
+            addresses: addHotelAddress
+          } );
+        },
+        error: ( err ) => {
+          console.log('ERROR:', err );
+        }
+      } )
+    }
   }
 
   handleHotelClick(hotel, event) {
@@ -364,31 +365,29 @@ class App extends React.Component {
 
   searchFood() {
     if ( this.state.arrivalLocation ) {
-      $.ajax({
+      $.ajax( {
+        type: 'POST',
         url: '/food',
         data: {
           location: this.state.arrivalLocation,
           rating: this.state.foodRating,
           price: this.state.foodPrice
         },
-        type: 'POST',
-        success: (res) => {
+        success: ( res ) => {
+          console.log( 'SUCESS: FOOD' );
 
-          const parsedFood = JSON.parse(res);
+          const parsedFood = JSON.parse( res );
+          const addFoodAddress = this.state.addresses.concat( parsedFood.map( this.responseToSaveAddress( 'food' ) ) );
 
-          const addFoodAddress = this.state.addresses
-            .concat(parsedFood.map(this.responseToSaveAddress('food')));
-
-          this.setState({
+          this.setState( {
             foodList: parsedFood,
             addresses: addFoodAddress
-          });
+          } );
         },
-
-        error: (err) => {
-          console.log('err', err);
+        error: ( err ) => {
+          console.log( 'ERROR:', err );
         }
-      })
+      } )
     }
   }
 
