@@ -2,7 +2,7 @@ const yelpConfig = require( '../../config.js' );
 const yelp = require( 'yelp-fusion' );
 
 var searchFood = function( location, rating, price, callback ){
-  var yelpKey = process.env.YELP_KEY || yelpConfig.yelpKey;
+  const yelpKey = process.env.YELP_KEY || yelpConfig.yelpKey;
   const client = yelp.client( yelpKey );
   
   var options = {
@@ -19,7 +19,6 @@ var searchFood = function( location, rating, price, callback ){
 
     client.search( options ).then( ( response ) => callback( response.jsonBody.businesses ) );
   }
-
 }
 
 module.exports.searchFood = searchFood;
