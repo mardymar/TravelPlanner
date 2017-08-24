@@ -34,7 +34,10 @@ app.get('/travelHotels', (req,res) => {
 
 app.post('/food', function (req, res){
   var location = req.body.location;
-  yelpfood.searchFood(location, function(foodresult){
+  var rating = req.body.rating;
+  var price = req.body.price;
+
+  yelpfood.searchFood(location, rating, price, function(foodresult){
     res.send(200, JSON.stringify(foodresult));
   });
 });

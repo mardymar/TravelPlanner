@@ -50,6 +50,8 @@ class App extends React.Component {
       budget: '$',
       exchange: {},
       max: 0
+      rating: true,
+      price: 1
     };
 
     this.onSearch = this.onSearch.bind(this);
@@ -361,13 +363,17 @@ class App extends React.Component {
   searchFood() {
     $.ajax({
       url: '/food',
-      data: {location: this.state.arrivalLocation},
+      data: {
+        location: this.state.arrivalLocation,
+        rating: this.state.rating,
+        price: this.state.price
+      },
       type: 'POST',
       success: (res) => {
 
         const parsedFood = JSON.parse(res);
 
-        parsedFood.sort((a, b,) => b.rating - a.rating);
+        // parsedFood.sort((a, b,) => b.rating - a.rating);
 
         const addFoodAddress = this.state.addresses
           .concat(parsedFood.map(this.responseToSaveAddress('food')));
@@ -507,6 +513,24 @@ class App extends React.Component {
     })
   }
 
+  sortFoodByRating() {
+    this.setState( { rating: !this.state.rating }, () => {
+      this.searchFood();
+    } );
+  }
+
+  sortFoodByPrice() {
+    if ( this.state.price === 4 ) {
+      var price = 1;
+    } else {
+      var price = this.state.price + 1;
+    }
+
+    this.setState( { price: price }, () => {
+      this.searchFood();
+    } );
+  }
+
   render() {
     return (
       <div>
@@ -531,7 +555,10 @@ class App extends React.Component {
               <th>Flights</th>
               <th>Lodging</th>
               <th>Attractions</th>
-              <th>Restaurants</th>
+              <th>Restaurants
+                <button onClick={ this.sortFoodByRating.bind( this ) } className='glyphicon glyphicon-star' style={ { float: 'right' } }></button>
+                <button onClick={ this.sortFoodByPrice.bind( this ) } className='glyphicon glyphicon-usd' style={ { float: 'right' } }></button>
+              </th>
               <th>Saved</th>
             </tr>
             </thead>
