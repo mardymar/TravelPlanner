@@ -49,7 +49,11 @@ class App extends React.Component {
       weatherIcon: '',
       budget: '$',
       exchange: {},
-      max: 0
+      max: 0,
+      hotelRating: true,
+      hotelPrice: 1,
+      foodRating: true,
+      foodPrice: 1
     };
 
     this.onSearch = this.onSearch.bind(this);
@@ -69,17 +73,17 @@ class App extends React.Component {
         exchange: res.quotes
       })
     });
-
-    $.get('/travelHotels', (res) => {
-      console.log(res);
-    })
   }
 
-  hotelsSearch() {
+  searchHotel() {
     $.ajax({
       url: '/hotels',
       method: 'GET',
-      data: {city: this.state.arrivalLocation},
+      data: { 
+        location: this.state.arrivalLocation,
+        rating: this.state.hotelRating,
+        price: this.state.hotelPrice
+      },
       success: (res) => {
         const parsedHotel = JSON.parse(res);
         console.log(parsedHotel);
@@ -330,7 +334,7 @@ class App extends React.Component {
       this.yelpAttrSearch();
       this.searchFood();
       this.getAirportCodes(departureLocation, arrivalLocation);
-      this.hotelsSearch(arrivalLocation);
+      this.searchHotel(arrivalLocation);
       this.requestWeather(arrivalLocation, departureDate);
     });
   }
@@ -359,29 +363,33 @@ class App extends React.Component {
   }
 
   searchFood() {
-    $.ajax({
-      url: '/food',
-      data: {location: this.state.arrivalLocation},
-      type: 'POST',
-      success: (res) => {
+    if ( this.state.arrivalLocation ) {
+      $.ajax({
+        url: '/food',
+        data: {
+          location: this.state.arrivalLocation,
+          rating: this.state.foodRating,
+          price: this.state.foodPrice
+        },
+        type: 'POST',
+        success: (res) => {
 
-        const parsedFood = JSON.parse(res);
+          const parsedFood = JSON.parse(res);
 
-        parsedFood.sort((a, b,) => b.rating - a.rating);
+          const addFoodAddress = this.state.addresses
+            .concat(parsedFood.map(this.responseToSaveAddress('food')));
 
-        const addFoodAddress = this.state.addresses
-          .concat(parsedFood.map(this.responseToSaveAddress('food')));
+          this.setState({
+            foodList: parsedFood,
+            addresses: addFoodAddress
+          });
+        },
 
-        this.setState({
-          foodList: parsedFood,
-          addresses: addFoodAddress
-        });
-      },
-
-      error: (err) => {
-        console.log('err', err);
-      }
-    })
+        error: (err) => {
+          console.log('err', err);
+        }
+      })
+    }
   }
 
   saveToDatabase() {
@@ -507,6 +515,30 @@ class App extends React.Component {
     })
   }
 
+  sortHotelByRating() {
+    this.setState( { hotelRating: !this.state.hotelRating }, () => {
+      this.searchHotel();
+    } );
+  }
+
+  sortHotelByPrice( event ) {
+    this.setState( { hotelRating: false, hotelPrice: event.target.textContent.length }, () => {
+      this.searchHotel();
+    } );
+  }
+
+  sortFoodByRating() {
+    this.setState( { foodRating: !this.state.foodRating }, () => {
+      this.searchFood();
+    } );
+  }
+
+  sortFoodByPrice( event ) {
+    this.setState( { foodRating: false, foodPrice: event.target.textContent.length }, () => {
+      this.searchFood();
+    } );
+  }
+
   render() {
     return (
       <div>
@@ -529,9 +561,31 @@ class App extends React.Component {
             <thead>
             <tr>
               <th>Flights</th>
-              <th>Lodging</th>
+              <th>Lodging
+                <button onClick={ this.sortHotelByRating.bind( this ) } className='glyphicon glyphicon-star' style={ { float: 'right' } }></button>
+                <span className="dropdown">
+                  <button className='glyphicon glyphicon-usd dropdown-toggle' data-toggle="dropdown" style={ { float: 'right' } }></button>
+                  <ul className="dropdown-menu">
+                    <li><a onClick={ this.sortHotelByPrice.bind( this ) }>$</a></li>
+                    <li><a onClick={ this.sortHotelByPrice.bind( this ) }>$$</a></li>
+                    <li><a onClick={ this.sortHotelByPrice.bind( this ) }>$$$</a></li>
+                    <li><a onClick={ this.sortHotelByPrice.bind( this ) }>$$$$</a></li>
+                  </ul>
+                </span>
+              </th>
               <th>Attractions</th>
-              <th>Restaurants</th>
+              <th>Restaurants
+                <button onClick={ this.sortFoodByRating.bind( this ) } className='glyphicon glyphicon-star' style={ { float: 'right' } }></button>
+                <span className="dropdown">
+                  <button className='glyphicon glyphicon-usd dropdown-toggle' data-toggle="dropdown" style={ { float: 'right' } }></button>
+                  <ul className="dropdown-menu">
+                    <li><a onClick={ this.sortFoodByPrice.bind( this ) }>$</a></li>
+                    <li><a onClick={ this.sortFoodByPrice.bind( this ) }>$$</a></li>
+                    <li><a onClick={ this.sortFoodByPrice.bind( this ) }>$$$</a></li>
+                    <li><a onClick={ this.sortFoodByPrice.bind( this ) }>$$$$</a></li>
+                  </ul>
+                </span>
+              </th>
               <th>Saved</th>
             </tr>
             </thead>
