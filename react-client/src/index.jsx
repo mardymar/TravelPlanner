@@ -49,7 +49,7 @@ class App extends React.Component {
       weatherIcon: '',
       budget: '$',
       exchange: {},
-      max: 0
+      max: 0,
       rating: true,
       price: 1
     };
