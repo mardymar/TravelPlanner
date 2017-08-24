@@ -466,8 +466,7 @@ class App extends React.Component {
 
     else {
       var index = -1;
-      console.log('list', list);
-      console.log('selectItem', itemData);
+
       for(var i = 0; i < list.length; i++) {
         if(list[i].name === itemData.name) {
           index = i;
