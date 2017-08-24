@@ -20,21 +20,17 @@ app.post('/attraction', function(req,res){
   })
 });
 
-app.get('/hotels', (req, res) => {
-  hotel.hotel(req.query, (data) => {
-    res.end(JSON.stringify(data))
-  })
-});
+app.get( '/hotels', ( req, res ) => {
+  hotel.hotel( req.query.location, req.query.rating, req.query.price, ( data ) => {
+    res.end( JSON.stringify( data ) )
+  } )
+} );
 
-app.post('/food', function (req, res){
-  var location = req.body.location;
-  var rating = req.body.rating;
-  var price = req.body.price;
-
-  yelpfood.searchFood(location, rating, price, function(foodresult){
-    res.send(200, JSON.stringify(foodresult));
-  });
-});
+app.post( '/food', function ( req, res ){
+  yelpfood.searchFood( req.body.location, req.body.rating, req.body.price, function( foodresult ) {
+    res.send( 200, JSON.stringify( foodresult ) );
+  } );
+} );
 
 app.post('/weather', function(req,res) {
   geolocation.requestGeolocation(req.body['location'], function(data){
