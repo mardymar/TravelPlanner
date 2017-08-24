@@ -526,7 +526,7 @@ class App extends React.Component {
       var price = this.state.price + 1;
     }
 
-    this.setState( { price: price }, () => {
+    this.setState( { rating: false, price: price }, () => {
       this.searchFood();
     } );
   }
