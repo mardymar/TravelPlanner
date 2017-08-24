@@ -50,8 +50,10 @@ class App extends React.Component {
       budget: '$',
       exchange: {},
       max: 0,
-      rating: true,
-      price: 1
+      hotelRating: true,
+      hotelPrice: 1,
+      foodRating: true,
+      foodPrice: 1
     };
 
     this.onSearch = this.onSearch.bind(this);
@@ -73,11 +75,15 @@ class App extends React.Component {
     });
   }
 
-  hotelsSearch() {
+  searchHotel() {
     $.ajax({
       url: '/hotels',
       method: 'GET',
-      data: {city: this.state.arrivalLocation},
+      data: { 
+        location: this.state.arrivalLocation,
+        rating: this.state.hotelRating,
+        price: this.state.hotelPrice
+      },
       success: (res) => {
         const parsedHotel = JSON.parse(res);
         console.log(parsedHotel);
@@ -328,7 +334,7 @@ class App extends React.Component {
       this.yelpAttrSearch();
       this.searchFood();
       this.getAirportCodes(departureLocation, arrivalLocation);
-      this.hotelsSearch(arrivalLocation);
+      this.searchHotel(arrivalLocation);
       this.requestWeather(arrivalLocation, departureDate);
     });
   }
@@ -362,15 +368,13 @@ class App extends React.Component {
         url: '/food',
         data: {
           location: this.state.arrivalLocation,
-          rating: this.state.rating,
-          price: this.state.price
+          rating: this.state.foodRating,
+          price: this.state.foodPrice
         },
         type: 'POST',
         success: (res) => {
 
           const parsedFood = JSON.parse(res);
-
-          // parsedFood.sort((a, b,) => b.rating - a.rating);
 
           const addFoodAddress = this.state.addresses
             .concat(parsedFood.map(this.responseToSaveAddress('food')));
@@ -511,22 +515,26 @@ class App extends React.Component {
     })
   }
 
+  sortHotelByRating() {
+    this.setState( { hotelRating: !this.state.hotelRating }, () => {
+      this.searchHotel();
+    } );
+  }
+
+  sortHotelByPrice( event ) {
+    this.setState( { hotelRating: false, hotelPrice: event.target.textContent.length }, () => {
+      this.searchHotel();
+    } );
+  }
+
   sortFoodByRating() {
-    this.setState( { rating: !this.state.rating }, () => {
+    this.setState( { foodRating: !this.state.foodRating }, () => {
       this.searchFood();
     } );
   }
 
   sortFoodByPrice( event ) {
-    if ( this.state.rating ) {
-      var price = this.state.price;
-    } else if ( this.state.price === 4 ) {
-      var price = 1;
-    } else {
-      var price = this.state.price + 1;
-    }
-
-    this.setState( { rating: false, price: event.target.textContent.length }, () => {
+    this.setState( { foodRating: false, foodPrice: event.target.textContent.length }, () => {
       this.searchFood();
     } );
   }
@@ -553,7 +561,18 @@ class App extends React.Component {
             <thead>
             <tr>
               <th>Flights</th>
-              <th>Lodging</th>
+              <th>Lodging
+                <button onClick={ this.sortHotelByRating.bind( this ) } className='glyphicon glyphicon-star' style={ { float: 'right' } }></button>
+                <span className="dropdown">
+                  <button className='glyphicon glyphicon-usd dropdown-toggle' data-toggle="dropdown" style={ { float: 'right' } }></button>
+                  <ul className="dropdown-menu">
+                    <li><a onClick={ this.sortHotelByPrice.bind( this ) }>$</a></li>
+                    <li><a onClick={ this.sortHotelByPrice.bind( this ) }>$$</a></li>
+                    <li><a onClick={ this.sortHotelByPrice.bind( this ) }>$$$</a></li>
+                    <li><a onClick={ this.sortHotelByPrice.bind( this ) }>$$$$</a></li>
+                  </ul>
+                </span>
+              </th>
               <th>Attractions</th>
               <th>Restaurants
                 <button onClick={ this.sortFoodByRating.bind( this ) } className='glyphicon glyphicon-star' style={ { float: 'right' } }></button>
