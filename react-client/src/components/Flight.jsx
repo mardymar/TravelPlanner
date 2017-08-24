@@ -5,14 +5,21 @@ const Flight = (props) => {
     time = time.replace(/T|\:\d\dZ/g,' ');
     time = time.slice(0, time.length - 6);
     return time;
-  }
+  };
 
   var getDuration = function(duration) {
     var minutes = duration % 60;
     var hours = (duration - minutes) / 60;
     var time = hours.toString() + " hrs " + (minutes < 10 ? "0" : "") + minutes.toString() + ' minutes';
     return time;
-  }
+  };
+
+  var exchange = function(){
+    var from = props.flight.saleTotal.slice(0,3);
+    var query = 'USD' + from;
+
+    return (props.flight.saleTotal.slice(3) / props.exchange[query]).toFixed(2);
+  };
 
   return (
     <div className="itemBorder" onClick={(e) => (props.handleFlightClick(props.flight, e))}>
@@ -38,11 +45,11 @@ const Flight = (props) => {
         </div>
       </div>
       <br className="avoid-clicks"></br>
-      <div className="avoid-clicks"><b>{props.flight.saleTotal.slice(0, 3)} {props.flight.saleTotal.slice(3)} per person</b></div>
+      <div className="avoid-clicks"><b>${exchange()} per person</b></div>
       <br></br>
       <br></br>
     </div>
   )
-}
+};
 
 export default Flight;

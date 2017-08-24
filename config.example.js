@@ -5,3 +5,4 @@ module.exports.yelpKey = 'YOUR_KEY_HERE'; //Yelp Fusion API
 module.exports.hotelkey = 'YOUR_KEY_HERE'; //Yelp Fusion API
 module.exports.darkskyAPI = 'YOUR_KEY_HERE'; //Dark Sky API
 module.exports.geolocationAPI = 'YOUR_KEY_HERE';  //Google Geo Coding API
+module.exports.currencyAPI = 'YOUR_KEY_HERE'; //Currency Layer API

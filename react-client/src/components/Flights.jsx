@@ -6,7 +6,7 @@ const Flights = (props) => {
     return (
       <div>
         {props.flights.map((flight) => (
-          <Flight handleFlightClick={props.handleFlightClick} flight={flight} key={flight.id}/>
+          <Flight handleFlightClick={props.handleFlightClick} exchange={props.exchange} flight={flight} key={flight.id}/>
         ))}
       </div>
     )

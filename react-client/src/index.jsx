@@ -47,10 +47,10 @@ class App extends React.Component {
       foodList: [],
       weather: [],
       weatherIcon: '',
-      budget: ''
+      budget: '$',
+      exchange: {},
+      max: 0
     };
-
-
 
     this.onSearch = this.onSearch.bind(this);
     this.responseToSaveAddress = this.responseToSaveAddress.bind(this);
@@ -63,6 +63,16 @@ class App extends React.Component {
 
   componentDidMount() {
     this.retrieveFromDatabase();
+
+    $.get('http://apilayer.net/api/live?access_key=1413ee013898f6dc75d92fa9f5444d13 ', (res) => {
+      this.setState({
+        exchange: res.quotes
+      })
+    });
+
+    $.get('/travelHotels', (res) => {
+      console.log(res);
+    })
   }
 
   hotelsSearch() {
@@ -72,6 +82,7 @@ class App extends React.Component {
       data: {city: this.state.arrivalLocation},
       success: (res) => {
         const parsedHotel = JSON.parse(res);
+        console.log(parsedHotel);
         parsedHotel.sort((a, b) => b.rating - a.rating);
         const addHotelAddress = this.state.addresses
           .concat(parsedHotel.map(this.responseToSaveAddress('hotel')));
@@ -105,12 +116,48 @@ class App extends React.Component {
       };
       this.state.savedChoices[0].hotel = saved;
     }
+
+    console.log(this.state.savedChoices);
   }
 
   changeBudget(e) {
-    var str = e.target.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    var str = '$' + str;
+    this.setState({
+      max: e.target.value
+    }, () => this.updateBudget());
 
+  }
+
+  updateBudget() {
+    var flight = 0;
+    if(this.state.savedChoices[0].flights.saletotal) {
+      var exchange = this.state.savedChoices[0].flights.saletotal.slice(4) / this.state.exchange['USD' +
+        this.state.savedChoices[0].flights.saletotal.slice(1,4)];
+      flight = exchange;
+    }
+
+    var food = 0;
+
+    var foodPrice = {1: 10, 2: 20, 3: 40, 4: 60};
+    for(var i = 0; i < this.state.savedChoices[0].food.length; i++) {
+      food += foodPrice[this.state.savedChoices[0].food[i].price.length];
+    }
+
+
+    var max = this.state.max || 0;
+    if(max === '-'){
+      max = 0;
+    }
+
+    var total = Math.round(max - flight - food);
+
+    if(total >= 0) {
+      $(".budgetfloat-wrapper").css("background", "rgba(96, 245, 118, .4)");
+    } else {
+      $(".budgetfloat-wrapper").css("background", "rgba(191, 54, 79, .4)");
+    }
+
+    var str = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    str = '$' + str;
 
     this.setState({
       budget: str
@@ -240,7 +287,7 @@ class App extends React.Component {
       var flight1 = flight.slice[0];
       var flight2 = flight.slice[1];
       var saved = {
-        saletotal: '$' + flight.saleTotal.slice(3),
+        saletotal: '$' + flight.saleTotal,
         goingDuration: flight1.duration,
         goingOrigin: flight1.segment[0].leg[0].origin,
         goingDestination: flight1.segment[0].leg[0].destination,
@@ -254,6 +301,7 @@ class App extends React.Component {
       };
       this.state.savedChoices[0].flights = saved;
     }
+    this.updateBudget();
   }
 
   onSearch(departureLocation, arrivalLocation, departureDate, returnDate) {
@@ -408,14 +456,24 @@ class App extends React.Component {
 
       list.push(selectItem);
     }
+
     else {
-      let index = list.indexOf(selectItem);
+      var index = -1;
+      console.log('list', list);
+      console.log('selectItem', itemData);
+      for(var i = 0; i < list.length; i++) {
+        if(list[i].name === itemData.name) {
+          index = i;
+        }
+      }
+
       if (index >= 0) {
         list.splice(index, 1);
       }
     }
 
     this.state.savedChoices[0][categoryName] = list;
+    this.updateBudget();
   }
 
   retrieveFromDatabase() {
@@ -480,7 +538,7 @@ class App extends React.Component {
             <tbody>
             <tr>
               <td>
-                <Flights handleFlightClick={this.handleFlightClick.bind(this)} flights={this.state.flights}/>
+                <Flights handleFlightClick={this.handleFlightClick.bind(this)} exchange={this.state.exchange} flights={this.state.flights}/>
               </td>
               <td>
                 <Hotels handleHotelClick={this.handleHotelClick.bind(this)} hotels={this.state.hotels}/>
