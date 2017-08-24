@@ -26,6 +26,12 @@ app.get('/hotels', (req, res) => {
   })
 });
 
+app.get('/travelHotels', (req,res) => {
+  $.get('http://engine.hotellook.com/api/v2/lookup.json?query=moscow&lang=ru&lookFor=both&limit=1', (result) => {
+    res.send(result);
+  })
+});
+
 app.post('/food', function (req, res){
   var location = req.body.location;
   yelpfood.searchFood(location, function(foodresult){
