@@ -13,23 +13,34 @@ const session = require('express-session');
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(session({secret: 'something'}));
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+
 require('../config/passport')(passport);
 
-app.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email' }));
+app.get('/getAll', (req, res) => {
+  console.log('juust check', req.session.passport)
+  db.selectAll(function(err, result) {
+    if(err) {
+      console.log('server received database error when retrieving records');
+    } else {
+      res.send(result);
+    }
+  })
+});
 
-app.get('/auth/facebook/callback', passport.authenticate('facebook', {  
-  successRedirect: 'www.facebook.com',
-  failureRedirect: '/',
-}));
+app.get('/auth/facebook', passport.authenticate('facebook', {authType: 'rerequest'}, { scope: ['user_friends','email']}));
 
-app.get('/auth/twitter', passport.authenticate('twitter'));
-
-app.get('/auth/twitter/callback', passport.authenticate('twitter', {  
+app.get('/auth/facebook/callback', passport.authenticate('facebook', {
   successRedirect: '/',
   failureRedirect: '/',
-}));
+}), (req, res) => {
+  console.log('inside facebook server', req.session)
+});
+
 
 app.post('/attraction', function(req,res){
   const attrLocation = req.body.location;
@@ -74,26 +85,15 @@ app.post('/save', (req, res) => {
   })
 });
 
+
 app.post('/removeRecord', (req, res) => {
    var id = req.body.uniqueID;
    db.deleteFromDatabase(id);
    res.sendStatus(200);
 });
 
-app.get('/getAll', (req, res) => {
-  db.selectAll(function(err, result) {
-    if(err) {
-      console.log('server received database error when retrieving records');
-    } else {
-      console.log(result);
-      res.send(result);
-    }
-  })
-});
+var port = process.env.PORT || 8080;
 
-
-
-var port = process.env.PORT || 3000;
 
 
 app.listen(port, function() {

@@ -33,8 +33,7 @@ var userSchema = mongoose.Schema({
   token: String,
   email: String,
   firstname: String,
-  lastname: String,
-  username: String
+  lastname: String
 });
 
 var Item = mongoose.model('Item', itemSchema);
@@ -44,11 +43,10 @@ var saveUser = (token, refreshToken, profile, callback) => {
 
   User.findOne({'facebookid': profile.id}, (err, user) => {
     if (err) {
-      return done(err);
+      return err;
     } 
     if (user) {
       return user
-      // return done(null, user);
     } else {
       var newUser = new User();
       newUser.facebookid = profile.id;
@@ -59,13 +57,19 @@ var saveUser = (token, refreshToken, profile, callback) => {
       newUser.save(err => {
         if (err) {
           console.log(err)
+          return err;
         }
         console.log('SUCCESS SAVED')
         return newUser;
-        // return done(null, newUser)
       });
     }
   });
+}
+
+var findUser = function(id, cb) {
+  User.findOne({'facebookid': id}, (err, user) => {
+    return cb(err, user);
+  })
 }
 
 var saveToDatabase = function(data,callback) {
@@ -121,8 +125,4 @@ module.exports.selectAll = selectAll;
 module.exports.saveToDatabase =saveToDatabase;
 module.exports.deleteFromDatabase =deleteFromDatabase;
 module.exports.saveUser = saveUser;
-
-User.find({}, (err, users) => {
-  console.log(users);
-})
-
+module.exports.findUser = findUser;

@@ -9,18 +9,18 @@ module.exports = {
   facebookAuth: {
     'clientID'      : '800127343493804', // your App ID
     'clientSecret'  : 'ff28fddd87c576829b9d579a7e58a427', // your App Secret
-    'callbackURL'   : 'http://localhost:3000/auth/facebook/callback'
+    'callbackURL'   : 'http://localhost:8080/auth/facebook/callback'
   },
 
   twitterAuth: {
     'consumerKey'       : 'HbN7yjtTXdyGkdgVguhdxmNqY',
     'consumerSecret'    : 'CUvywLZTIa8prRAT6UEgpA9GI0G27R7HybaS2hEEFJ045xfoIr',
-    'callbackURL'       : 'http://localhost:3000/auth/twitter/callback'
+    'callbackURL'       : 'http://localhost:8080/auth/twitter/callback'
   },
 
   googleAuth: {
     'clientID'      : '659679170654-gv1rddj7r7gd9np313kfqa9hhb8miatn.apps.googleusercontent.com',
     'clientSecret'  : 'LO2WZYauQk6Tdxg__dhbCgPS',
-    'callbackURL'   : 'http://localhost:3000/auth/google/callback'
+    'callbackURL'   : 'http://localhost:8080/auth/google/callback'
   }
 };

@@ -18,6 +18,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      user: '',
       departureLocation: '',
       arrivalLocation: '',
       departureDate: '',
@@ -72,7 +73,6 @@ class App extends React.Component {
 
   componentDidMount() {
     this.retrieveFromDatabase();
-
     $.get('http://apilayer.net/api/live?access_key=1413ee013898f6dc75d92fa9f5444d13 ', (res) => {
       this.setState({
         exchange: res.quotes
@@ -417,6 +417,7 @@ class App extends React.Component {
       method: 'post',
       data: {data: JSON.stringify(app.state.savedChoices[0])},
       success: (data) => {
+        console.log(data)
         this.retrieveFromDatabase();
       },
       error: (err) => {
@@ -571,13 +572,11 @@ class App extends React.Component {
     } );
   }
 
-
   sortFoodByRating() {
     this.setState( { foodRating: !this.state.foodRating }, () => {
       this.searchFood();
     } );
   }
-
 
   sortFoodByPrice( event ) {
     this.setState( { foodRating: false, foodPrice: event.target.textContent.length }, () => {
@@ -590,9 +589,7 @@ class App extends React.Component {
       <div>
         <BudgetFloat budget={this.state.budget}/>
         <div className="container-fluid">
-
           <h1 id='title'>Navigato</h1>
-          
           <div className="row">
             <div className="col-sm-2 weather-icon">
               <Weather information={this.state.weather} icon={this.state.weatherIcon}/>

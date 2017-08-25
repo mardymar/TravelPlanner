@@ -5,11 +5,14 @@ var db = require('../database-mongo');
 
 
 module.exports = function(passport) {  
+
   passport.serializeUser(function(user, done) {
+    console.log('is this working')
     done(null, user.id);
   });
   passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
+    console.log('this is not working correctly', id)
+    db.findUser(id, function(err, user) {
       done(err, user);
     });
   });
@@ -19,34 +22,18 @@ module.exports = function(passport) {
     clientSecret: configAuth.facebookAuth.clientSecret,
     callbackURL: configAuth.facebookAuth.callbackURL,
     profileFields: ['id', 'email', 'first_name', 'last_name'],
+    enableProof: true
   },
+
   function(token, refreshToken, profile, done) {
     process.nextTick(function() {
       db.saveUser(token, refreshToken, profile, function(data) {
-        console.log(data);
-        return done(null, profile)
+        return done(null, data)
+        next();
       });
-
-      // User.findOne({ 'facebook.id': profile.id }, function(err, user) {
-      //   if (err)
-      //     return done(err);
-      //   if (user) {
-      //     return done(null, user);
-      //   } else {
-      //     var newUser = new User();
-      //     newUser.facebook.id = profile.id;
-      //     newUser.facebook.token = token;
-      //     newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
-      //     newUser.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
-      //     newUser.save(function(err) {
-      //       if (err)
-      //         throw err;
-      //       return done(null, newUser);
-      //     });
-      //   }
-      // });
+      return done(null, profile)
     });
+
   }));
 
 
