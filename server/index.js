@@ -26,6 +26,7 @@ app.get( '/hotels', ( req, res ) => {
   } )
 } );
 
+
 app.post( '/food', function ( req, res ){
   yelpfood.searchFood( req.body.location, req.body.rating, req.body.price, function( foodresult ) {
     res.send( 200, JSON.stringify( foodresult ) );
@@ -77,4 +78,4 @@ var port = process.env.PORT || 8080;
 
 app.listen(port, function() {
   console.log(`listening on port ${port}`);
-})
+});
