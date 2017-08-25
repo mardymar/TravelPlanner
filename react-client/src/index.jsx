@@ -345,11 +345,11 @@ class App extends React.Component {
         weather: {}
       }]
     }, function () {
+      this.getAirportCodes(departureLocation, arrivalLocation);
+      this.requestWeather(arrivalLocation, departureDate);
+      this.searchHotel(arrivalLocation);
       this.yelpAttrSearch();
       this.searchFood();
-      this.getAirportCodes(departureLocation, arrivalLocation);
-      this.searchHotel(arrivalLocation);
-      this.requestWeather(arrivalLocation, departureDate);
     });
   }
 
@@ -359,6 +359,7 @@ class App extends React.Component {
       type: 'POST',
       data: {location: this.state.arrivalLocation},
       success: (res) => {
+        console.log( 'SUCCESS: ATTRACTIONS' );
 
         const parsedAttr = JSON.parse(res);
 
@@ -433,20 +434,21 @@ class App extends React.Component {
   }
 
   requestWeather(city, date) {
-    var context = this;
     $.ajax({
       method: "POST",
       url: "/weather",
       data: {location: city, date: date},
-      success: function (data) {
+      success: (data) => {
+        console.log( 'SUCCESS: WEATHER' );
+
         var parsedData = JSON.parse(data);
-        context.setState({
+        this.setState({
           weather: [parsedData],
           weatherIcon: parsedData.icon
         })
       },
       error: function (err) {
-        console.log('error in requesting data.')
+        console.log( 'ERROR:', err );
       }
     })
   }
