@@ -7,10 +7,11 @@ class SearchBar extends React.Component {
     super(props);
     this.state = {
       departureLocation: '',
-      arrivalLocation:'',
+      arrivalLocation: '',
       departureDate: '',
       returnDate: ''
-    }
+    };
+
     this.handleDepartureText = this.handleDepartureText.bind(this);
     this.handleArrivalText = this.handleArrivalText.bind(this);
     this.handleDepartureDate = this.handleDepartureDate.bind(this);
@@ -18,46 +19,46 @@ class SearchBar extends React.Component {
     this.handleSearchClick = this.handleSearchClick.bind(this);
   }
 
-    handleDepartureText(e) {
-      this.setState({
-        departureLocation: e.target.value
-      })
-    }
+  handleDepartureText(e) {
+    this.setState({
+      departureLocation: e.target.value
+    })
+  }
 
-    handleArrivalText(e) {
-      this.setState({
-        arrivalLocation: e.target.value
-      })
-    }
+  handleArrivalText(e) {
+    this.setState({
+      arrivalLocation: e.target.value
+    })
+  }
 
-    handleDepartureDate(e) {
-      this.setState({
-        departureDate: e.target.value
-      })
-    }
+  handleDepartureDate(e) {
+    this.setState({
+      departureDate: e.target.value
+    })
+  }
 
-    handleReturnDate(e) {
-      this.setState({
-        returnDate: e.target.value
-      })
-    }
+  handleReturnDate(e) {
+    this.setState({
+      returnDate: e.target.value
+    })
+  }
 
-    handleSearchClick(e) {
-      e.preventDefault();
-      this.props.onSearch(this.state.departureLocation, this.state.arrivalLocation, this.state.departureDate, this.state.returnDate);
-    }
+  handleSearchClick(e) {
+    e.preventDefault();
+    this.props.onSearch(this.state.departureLocation, this.state.arrivalLocation, this.state.departureDate, this.state.returnDate);
+  }
 
   render() {
-    return(
-      <div className = 'search'>
+    return (
+      <div className='search'>
         <form >
-            <div className="search-wrapper group">
-              <CitySearch handleChange = {this.handleDepartureText} description = "Departure City"/>
-              <CitySearch handleChange = {this.handleArrivalText} description = "Arrival City"/>
-              <Calendar handleChange = {this.handleDepartureDate} description = "Departure"/>
-              <Calendar handleChange = {this.handleReturnDate} description = "Return"/>
-              <button type = 'submit' onClick = {this.handleSearchClick} >Search</button>
-            </div>
+          <div className="search-wrapper group">
+            <CitySearch handleChange={this.handleDepartureText} description="Departure City"/>
+            <CitySearch handleChange={this.handleArrivalText} description="Arrival City"/>
+            <Calendar handleChange={this.handleDepartureDate} description="Departure"/>
+            <Calendar handleChange={this.handleReturnDate} description="Return"/>
+            <button type='submit' onClick={this.handleSearchClick}>Search</button>
+          </div>
         </form>
       </div>
     )

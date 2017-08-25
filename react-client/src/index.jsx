@@ -53,7 +53,8 @@ class App extends React.Component {
       hotelRating: true,
       hotelPrice: 1,
       foodRating: true,
-      foodPrice: 1
+      foodPrice: 1,
+      nights: 0
     };
 
     this.onSearch = this.onSearch.bind(this);
@@ -122,7 +123,7 @@ class App extends React.Component {
       this.state.savedChoices[0].hotel = saved;
     }
 
-    console.log(this.state.savedChoices);
+    this.updateBudget();
   }
 
   changeBudget(e) {
@@ -142,18 +143,26 @@ class App extends React.Component {
 
     var food = 0;
 
-    var foodPrice = {1: 10, 2: 20, 3: 40, 4: 60};
+    var foodPrice = {1: 11, 2: 22, 3: 44, 4: 66};
     for(var i = 0; i < this.state.savedChoices[0].food.length; i++) {
       food += foodPrice[this.state.savedChoices[0].food[i].price.length];
     }
 
+    console.log(this.state.savedChoices[0]);
+
+    var hotel = 0;
+
+    var hotelPrice = {1: 64, 2: 113, 3: 201, 4: 512};
+    if(this.state.savedChoices[0].hotel.price) {
+      hotel = hotelPrice[this.state.savedChoices[0].hotel.price.length] * this.state.nights;
+    }
 
     var max = this.state.max || 0;
     if(max === '-'){
       max = 0;
     }
 
-    var total = Math.round(max - flight - food);
+    var total = Math.round(max - flight - food - hotel);
 
     if(total >= 0) {
       $(".budgetfloat-wrapper").css("background", "rgba(96, 245, 118, .4)");
@@ -194,6 +203,7 @@ class App extends React.Component {
     };
     var context = this;
     qpx.getInfo(body, function (error, data) {
+      console.log(data);
       context.setState({
         flights: data.trips.tripOption
       })
@@ -314,6 +324,7 @@ class App extends React.Component {
     console.log('the arrival location is: ', arrivalLocation);
     console.log('the departure date is: ', departureDate);
     console.log('the return date is: ', returnDate);
+    console.log('number of nights are: ', (Date.parse(returnDate) - Date.parse(departureDate))/86400000);
     this.removeClass('flightHighlight');
     this.removeClass('hotelHighlight');
     this.setState({
@@ -321,6 +332,7 @@ class App extends React.Component {
       arrivalLocation: arrivalLocation,
       departureDate: departureDate,
       returnDate: returnDate,
+      nights: (Date.parse(returnDate) - Date.parse(departureDate))/86400000,
       attrItems: [],
       foodList: [],
       addresses: [],
