@@ -15,7 +15,7 @@ class BudgetBar extends React.Component {
           <label >Budget:</label>
         </div>
         <div className="input">
-          <input type="text" className="input-text" placeholder="Enter a budget"
+          <input type="text" className="budget-bar-text" placeholder="Enter a budget"
                  onChange={this.props.changeBudget.bind(this)}/>
         </div>
       </div>

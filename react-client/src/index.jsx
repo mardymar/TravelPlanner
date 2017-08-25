@@ -137,8 +137,8 @@ class App extends React.Component {
   updateBudget() {
     var flight = 0;
     if(this.state.savedChoices[0].flights.saletotal) {
-      var exchange = this.state.savedChoices[0].flights.saletotal.slice(4) / this.state.exchange['USD' +
-        this.state.savedChoices[0].flights.saletotal.slice(1,4)];
+      var exchange = this.state.savedChoices[0].flights.saletotal.slice(3) / this.state.exchange['USD' +
+        this.state.savedChoices[0].flights.saletotal.slice(0,3)];
       flight = exchange;
     }
 
@@ -303,7 +303,7 @@ class App extends React.Component {
       var flight1 = flight.slice[0];
       var flight2 = flight.slice[1];
       var saved = {
-        saletotal: '$' + flight.saleTotal,
+        saletotal: flight.saleTotal,
         goingDuration: flight1.duration,
         goingOrigin: flight1.segment[0].leg[0].origin,
         goingDestination: flight1.segment[0].leg[0].destination,
@@ -554,7 +554,7 @@ class App extends React.Component {
       <div>
         <BudgetFloat budget={this.state.budget}/>
         <div className="container-fluid">
-          <h1 id='title'>Wanderly</h1>
+          <h1 id='title'>Navigato</h1>
           <div className="row">
             <div className="col-sm-2 weather-icon">
               <Weather information={this.state.weather} icon={this.state.weatherIcon}/>
