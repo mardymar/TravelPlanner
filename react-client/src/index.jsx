@@ -50,6 +50,7 @@ class App extends React.Component {
       budget: '$',
       exchange: {},
       max: 0,
+
       hotelRating: true,
       hotelPrice: 1,
       foodRating: true,
@@ -478,7 +479,6 @@ class App extends React.Component {
 
     else {
       var index = -1;
-
       for(var i = 0; i < list.length; i++) {
         if(list[i].name === itemData.name) {
           index = i;
