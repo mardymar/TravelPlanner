@@ -40,7 +40,7 @@ body {
 }
 
 .search-wrapper {
-  background: rgba(225, 208, 116, .3);;
+  background: rgba(225, 208, 116, .3);
   padding: 1em 1em 1em 1em;
   border-radius: 25px;
   text-align: center;
@@ -49,7 +49,7 @@ body {
 }
 
 .budgetbar-wrapper {
-  background: rgba(255, 233, 234, .3);;
+  background: rgba(225, 208, 116, .3);
   border-radius: 25px;
   padding: 1em 1em 1em 1em;
   text-align: center;
@@ -60,7 +60,7 @@ body {
 }
 
 .budgetfloat-wrapper {
-  background: rgba(96, 245, 118, .4);
+  background: rgba(7, 242, 219, .4);
   border-radius: 100px;
   padding: 1em 1em 1em 1em;
   text-align: center;
@@ -86,7 +86,7 @@ body {
 }
 
 .budget-bar-text {
-  background-color: #FFE9EA;
+  background-color: #FFDBB1;
   padding: 2px 10px;
   color: #333;
   border: 1px solid #dddddd;

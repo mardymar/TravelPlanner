@@ -166,7 +166,7 @@ class App extends React.Component {
     var total = Math.round(max - flight - food - hotel);
 
     if(total >= 0) {
-      $(".budgetfloat-wrapper").css("background", "rgba(96, 245, 118, .4)");
+      $(".budgetfloat-wrapper").css("background", "rgba(7, 242, 219, .4)");
     } else {
       $(".budgetfloat-wrapper").css("background", "rgba(191, 54, 79, .4)");
     }
