@@ -39,6 +39,7 @@ class FoodItem extends React.Component {
         <div>
           <b>{ this.props.fooditem.name }</b>
         </div>
+        <div id="foodtype">{this.props.fooditem.categories[0].title}</div>
         <div className="food-address">{ this.props.fooditem.location.display_address.join(', ') }</div>
         <div className="row">
           <div className='avoid-clicks col-sm-4'><strong>Price: </strong> {this.props.fooditem.price}</div>
@@ -46,7 +47,6 @@ class FoodItem extends React.Component {
             <strong>Rating:</strong> <img src={this.stars[this.props.fooditem.rating]}/></div>
         </div>
         <div>
-          <span id="foodtype">{this.props.fooditem.categories[0].title}</span>
         </div>
         <img src={ this.props.fooditem.image_url } width='150' height='150'></img>
       </div>
