@@ -13,7 +13,7 @@ const session = require('express-session');
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({secret: 'something'}));
+app.use(session({secret: 'something', resave: true, saveUninitialized: true }));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -22,7 +22,6 @@ app.use(passport.session());
 require('../config/passport')(passport);
 
 app.get('/getAll', (req, res) => {
-  console.log('juust check', req.session.passport)
   db.selectAll(function(err, result) {
     if(err) {
       console.log('server received database error when retrieving records');
