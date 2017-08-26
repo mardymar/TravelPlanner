@@ -10,15 +10,18 @@ const weather = require('./weatherAPI/weather.js');
 const geolocation = require('./geolocationAPI/geolocation.js');
 const passport = require('passport');
 const session = require('express-session');
-const passportConfig = require('../config/passport')
+const passportConfig = require('../config/passport');
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({secret: 'something', resave: true, saveUninitialized: true }));
-
 app.use(passport.initialize());
 app.use(passport.session());
 
+// app.use(function * setUserInContext (next) {
+//   this.user = this.req.user;
+//   yield next
+// });
 
 passportConfig.init(passport);
 
@@ -63,6 +66,7 @@ app.post( '/food', function ( req, res ){
 
 app.post('/weather', function(req,res) {
   geolocation.requestGeolocation(req.body['location'], function(data){
+    console.log('Geo loc', data);
     geoCode = data.results[0].geometry.location;
     weather.requestWeather(geoCode, req.body['date'], function(data) {
       var parsedData = JSON.parse(data);
@@ -76,7 +80,7 @@ app.post('/weather', function(req,res) {
 
 app.post('/save', (req, res) => {
   var data = JSON.parse(req.body.data);
-  console.log('session..................................................\n', passportConfig.getId);
+  console.log('session..................................................\n', req.session);
   console.log('body..................................................\n', req.body);
   db.saveToDatabase(data, function(err, result) {
     if(err) {
@@ -95,8 +99,6 @@ app.post('/removeRecord', (req, res) => {
 });
 
 var port = process.env.PORT || 8080;
-
-
 
 app.listen(port, function() {
   console.log(`listening on port ${port}`);

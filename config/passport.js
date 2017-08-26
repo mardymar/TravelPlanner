@@ -1,10 +1,10 @@
+
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;  
 var configAuth = require('./auth');
 var db = require('../database-mongo');
 
 
-var facebookId = 0;
 
 module.exports.init = function(passport) {
 
@@ -12,8 +12,9 @@ module.exports.init = function(passport) {
     console.log('is this working');
     done(null, user.id);
   });
+
   passport.deserializeUser(function(id, done) {
-    console.log('this is not working correctly', id);
+
     db.findUser(id, function(err, user) {
       done(err, user);
     });
@@ -29,15 +30,10 @@ module.exports.init = function(passport) {
 
   function(token, refreshToken, profile, done) {
     console.log('profile', profile);
-    facebookId = profile.id;
+    this.facebookId = profile.id;
     process.nextTick(function() {
-      db.saveUser(token, refreshToken, profile, function(data) {
-        return done(null, data);
-        next();
-      });
-      return done(null, profile)
+      done(null, profile);
+      next();
     });
   }));
 };
-
-module.exports.getId = facebookId;

@@ -68,15 +68,15 @@ var saveUser = (token, refreshToken, profile, callback) => {
 
 var findUser = function(id, cb) {
   User.findOne({'facebookid': id}, (err, user) => {
-    return cb(err, user);
+    cb(err, user);
   })
 };
 
-var saveToDatabase = function(data,callback) {
-  console.log('data.....................', data);
+var saveToDatabase = function(data, user, callback) {
+  console.log(user);
   Item.find({flights: data.flights, hotel: data.hotel, attractions: data.attractions, food: data.food, cost: data.cost}, (err, result) => {
     if (err) {
-      callback(err, null);
+      //callback(err, null);
     } else {
       if(result.length === 0) {
          var item = new Item;
@@ -89,10 +89,10 @@ var saveToDatabase = function(data,callback) {
          item.save(function(err, result) {
            if(err) {
              console.log('error saving to the db ', err);
-             callback(err, null);
+             //callback(err, null);
            } else {
              console.log('successfully saved a new record to the db ');
-             callback(null, result);
+             //callback(null, result);
            }
          })
       }
