@@ -9,13 +9,13 @@ class SavedRecordPanel extends React.Component {
     super(props);
   }
   render() {
-    console.log('the props for this trip are ', this.props.trip)
     return(
       <div>
         <SavedFlightPanel trip = {this.props.trip}/>
         <SavedHotelPanel trip = {this.props.trip} />
         <SavedAttractionPanel trip = {this.props.trip} />
         <SavedFoodPanel trip = {this.props.trip}/>
+        <div>This trip will cost you <b>${Math.round(this.props.trip.cost)}</b>!</div>
       </div>
     )
   }

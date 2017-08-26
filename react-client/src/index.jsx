@@ -38,7 +38,8 @@ class App extends React.Component {
         hotel: {},
         attractions: [],
         food: [],
-        weather: {}
+        weather: {},
+        cost: 0
       }],
       airportCodes: {},
       savedTrips: [],
@@ -57,6 +58,8 @@ class App extends React.Component {
       foodPrice: 1,
       nights: 0
     };
+
+    this.expenses = 0;
 
     this.onSearch = this.onSearch.bind(this);
     this.responseToSaveAddress = this.responseToSaveAddress.bind(this);
@@ -162,7 +165,10 @@ class App extends React.Component {
       max = 0;
     }
 
-    var total = Math.round(max - flight - food - hotel);
+    var expenses = flight + food + hotel;
+    this.state.savedChoices[0].cost = expenses;
+
+    var total = Math.round(max - expenses);
 
     if(total >= 0) {
       $(".budgetfloat-wrapper").css("background", "rgba(7, 242, 219, .4)");
@@ -501,6 +507,7 @@ class App extends React.Component {
       url: '/getAll',
       method: 'GET',
       success: (data) => {
+        console.log(data);
         context.setState({
           savedTrips: data
         }, function () {

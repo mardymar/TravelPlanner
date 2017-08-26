@@ -24,6 +24,7 @@ class SavedTrip extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     if(!this.state.clicked) {
       return (
         <div >

@@ -26,8 +26,6 @@ app.get( '/hotels', ( req, res ) => {
   } )
 } );
 
-
-
 app.post( '/food', function ( req, res ){
   yelpfood.searchFood( req.body.location, req.body.rating, req.body.price, function( foodresult ) {
     res.send( 200, JSON.stringify( foodresult ) );
@@ -45,7 +43,7 @@ app.post('/weather', function(req,res) {
       res.send(JSON.stringify({'averageTemp': averageTemp, 'description': parsedData.daily.data[0].summary, 'icon': parsedData.daily.data[0].icon}));
     });
   });
-})
+});
 
 app.post('/save', (req, res) => {
   var data = JSON.parse(req.body.data);
@@ -69,6 +67,7 @@ app.get('/getAll', (req, res) => {
     if(err) {
       console.log('server received database error when retrieving records');
     } else {
+      console.log(result);
       res.send(result);
     }
   })
