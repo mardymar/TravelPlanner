@@ -282,11 +282,16 @@ class App extends React.Component {
                 });
               })
               .then(() => {
+                console.log(codes);
                 context.retrieveFlights(context.state.departureDate, context.state.returnDate, codes.departLoc, codes.arrivalLoc);
               });
           })
       });
   }
+
+  getClosestAirport() {
+
+  };
 
   removeClass(classname) {
     var elems = document.querySelectorAll(`.${classname}`);
